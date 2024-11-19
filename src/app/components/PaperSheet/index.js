@@ -15,6 +15,9 @@ export default function PaperSheet() {
   const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef(null);
   const { triggerUpdate } = useStory();
+  const [title, setTitle] = useState('');
+  const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
+  const [displayTitle, setDisplayTitle] = useState('');
 
   const eraseText = async (text) => {
     setIsErasing(true);
@@ -26,6 +29,54 @@ export default function PaperSheet() {
     }
     setIsErasing(false);
     setPrompt('');
+  };
+
+  const animateText = async (text, setter, delay = 30) => {
+    let current = '';
+    for (let i = 0; i < text.length; i++) {
+      current += text[i];
+      setter(current);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  };
+
+  const generateTitle = async (content) => {
+    setIsGeneratingTitle(true);
+    setDisplayTitle('Придумываю название...');
+
+    try {
+      const response = await fetch('/api/generateTitle', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content }),
+      });
+
+      if (!response.ok) throw new Error('Failed to generate title');
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let titleText = '';
+
+      await animateText('', setDisplayTitle);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        titleText += chunk;
+        setTitle(titleText);
+        setDisplayTitle(titleText);
+      }
+
+    } catch (error) {
+      console.error('Error:', error);
+      setDisplayTitle('Ошибка генерации названия');
+    } finally {
+      setIsGeneratingTitle(false);
+    }
   };
 
   const handleKeyDown = async (e) => {
@@ -59,6 +110,8 @@ export default function PaperSheet() {
           storyText += chunk;
           setStory(storyText);
         }
+
+        await generateTitle(storyText);
 
         const saveResponse = await fetch('/api/saveStory', {
           method: 'POST',
@@ -97,6 +150,8 @@ export default function PaperSheet() {
     setStory('');
     setSavedStoryId(null);
     setStoryMeta(null);
+    setTitle('');
+    setDisplayTitle('');
   };
 
   useEffect(() => {
@@ -169,6 +224,20 @@ export default function PaperSheet() {
       )}
 
       <div className="p-6">
+        {(displayTitle || isGeneratingTitle) && (
+          <motion.div 
+            className="mb-4 text-lg font-neucha leading-snug"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="whitespace-pre-wrap break-words max-w-full">
+              {displayTitle}
+              {isGeneratingTitle && <Cursor />}
+            </div>
+          </motion.div>
+        )}
+
         <div className="relative">
           <div className={`w-full p-4 text-lg border rounded-lg min-h-[120px] bg-white
             ${story ? 'story-text' : 'font-neucha'} transition-all duration-200 hover:border-gray-300`}

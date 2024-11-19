@@ -9,7 +9,7 @@ datasource db {
 
 model Story {
   id        String   @id @default(uuid())
-  title     String
+  title     String   @default("")
   content   String
   prompt    String
   model     String
