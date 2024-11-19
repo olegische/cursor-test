@@ -127,29 +127,30 @@ export default function PaperSheet() {
 
   return (
     <motion.div 
-      className="w-full bg-paper rounded-lg shadow-lg p-6"
+      className="w-full bg-paper rounded-lg shadow-lg overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
       {storyMeta && (
         <motion.div 
-          className="mb-4 text-sm text-gray-500 font-mono flex items-center gap-3"
+          className="meta-container"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <span>#{storyMeta.number}</span>
-          <span>·</span>
-          <span>{storyMeta.createdAt.toLocaleString()}</span>
-          <span>·</span>
-          <span>{storyMeta.model}</span>
-          {savedStoryId && (
-            <>
-              <span>·</span>
+          <div className="text-sm font-medium">
+            История #{storyMeta.number}
+          </div>
+          <div className="meta-center text-sm">
+            {storyMeta.createdAt.toLocaleString()}
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-sm">{storyMeta.model}</span>
+            {savedStoryId && (
               <a 
                 href={`/story/${savedStoryId}`} 
-                className="text-blue-500 hover:text-blue-600 transition-colors"
+                className="share-button"
                 title="Поделиться историей"
               >
                 <svg 
@@ -160,47 +161,50 @@ export default function PaperSheet() {
                 >
                   <path fillRule="evenodd" d="M15.75 4.5a3 3 0 11.825 2.066l-8.421 4.679a3.002 3.002 0 010 1.51l8.421 4.679a3 3 0 11-.729 1.31l-8.421-4.678a3 3 0 110-4.132l8.421-4.679a3 3 0 01-.096-.755z" clipRule="evenodd" />
                 </svg>
+                <span className="text-xs">Поделиться</span>
               </a>
-            </>
-          )}
+            )}
+          </div>
         </motion.div>
       )}
 
-      <div className="relative">
-        <div className={`w-full p-4 text-lg border rounded-lg min-h-[120px] bg-white
-          ${story ? 'story-text' : 'font-neucha'}`}
-        >
-          <span>{story || displayPrompt}</span>
-          {!story && !isGenerating && isFocused && <Cursor />}
-        </div>
-        <textarea
-          ref={textareaRef}
-          value={story || displayPrompt}
-          onChange={(e) => !story && setPrompt(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          placeholder="О чем вы хотите услышать историю? Нажмите Enter для генерации"
-          className="absolute inset-0 w-full h-full p-4 text-lg opacity-0"
-          disabled={isGenerating || isErasing}
-        />
-      </div>
-      
-      {story && (
-        <motion.div 
-          className="mt-4 flex justify-end"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          <button
-            onClick={handleReset}
-            className="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+      <div className="p-6">
+        <div className="relative">
+          <div className={`w-full p-4 text-lg border rounded-lg min-h-[120px] bg-white
+            ${story ? 'story-text' : 'font-neucha'} transition-all duration-200 hover:border-gray-300`}
           >
-            Новая история
-          </button>
-        </motion.div>
-      )}
+            <span>{story || displayPrompt}</span>
+            {!story && !isGenerating && isFocused && <Cursor />}
+          </div>
+          <textarea
+            ref={textareaRef}
+            value={story || displayPrompt}
+            onChange={(e) => !story && setPrompt(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            placeholder="О чем вы хотите услышать историю? Нажмите Enter для генерации"
+            className="absolute inset-0 w-full h-full p-4 text-lg opacity-0"
+            disabled={isGenerating || isErasing}
+          />
+        </div>
+        
+        {story && (
+          <motion.div 
+            className="mt-4 flex justify-end"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <button
+              onClick={handleReset}
+              className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Новая история
+            </button>
+          </motion.div>
+        )}
+      </div>
     </motion.div>
   );
 } 
