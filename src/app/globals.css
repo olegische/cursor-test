@@ -23,7 +23,16 @@ body {
 }
 
 .story-text {
-  font-family: var(--font-geist-sans);
-  line-height: 1.6;
+  font-family: 'Neucha', cursive;
+  font-size: 1.125rem;
+  line-height: 1.75;
   white-space: pre-wrap;
+}
+
+.font-neucha {
+  font-family: 'Neucha', cursive;
+}
+
+.bg-paper {
+  background-color: #fffdf0;
 }

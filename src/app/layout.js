@@ -1,6 +1,5 @@
 import localFont from "next/font/local";
 import "./globals.css";
-import LastStory from './components/LastStory';
 import { StoryProvider } from './context/StoryContext';
 
 const geistSans = localFont({
@@ -27,7 +26,6 @@ export default function RootLayout({ children }) {
           <div className="min-h-screen flex flex-col items-center p-4 bg-background">
             <div className="w-full max-w-4xl space-y-8 py-8">
               {children}
-              <LastStory />
             </div>
           </div>
         </StoryProvider>
