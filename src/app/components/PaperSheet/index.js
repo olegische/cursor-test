@@ -12,6 +12,7 @@ export default function PaperSheet() {
   const [isErasing, setIsErasing] = useState(false);
   const [savedStoryId, setSavedStoryId] = useState(null);
   const [storyMeta, setStoryMeta] = useState(null);
+  const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef(null);
   const { triggerUpdate } = useStory();
 
@@ -24,6 +25,7 @@ export default function PaperSheet() {
       await new Promise(resolve => setTimeout(resolve, 50));
     }
     setIsErasing(false);
+    setPrompt('');
   };
 
   const handleKeyDown = async (e) => {
@@ -110,6 +112,19 @@ export default function PaperSheet() {
     }
   }, [story, displayPrompt]);
 
+  const Cursor = () => (
+    <motion.div
+      className="inline-block w-2 h-5 bg-blue-500 ml-0.5"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: [0, 1, 1, 0] }}
+      transition={{
+        repeat: Infinity,
+        duration: 1,
+        times: [0, 0.2, 0.8, 1]
+      }}
+    />
+  );
+
   return (
     <motion.div 
       className="w-full bg-paper rounded-lg shadow-lg p-6"
@@ -152,30 +167,23 @@ export default function PaperSheet() {
       )}
 
       <div className="relative">
+        <div className={`w-full p-4 text-lg border rounded-lg min-h-[120px] bg-white
+          ${story ? 'story-text' : 'font-neucha'}`}
+        >
+          <span>{story || displayPrompt}</span>
+          {!story && !isGenerating && isFocused && <Cursor />}
+        </div>
         <textarea
           ref={textareaRef}
           value={story || displayPrompt}
           onChange={(e) => !story && setPrompt(e.target.value)}
           onKeyDown={handleKeyDown}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           placeholder="О чем вы хотите услышать историю? Нажмите Enter для генерации"
-          className={`w-full p-4 text-lg border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 
-            ${story ? 'story-text' : 'font-neucha'} min-h-[120px]`}
+          className="absolute inset-0 w-full h-full p-4 text-lg opacity-0"
           disabled={isGenerating || isErasing}
-          style={{ overflow: 'hidden' }}
         />
-        <AnimatePresence>
-          {(isGenerating || isErasing) && (
-            <motion.div
-              className="absolute right-4 top-4 w-1 h-6 bg-blue-500"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0, 1, 0] }}
-              transition={{
-                repeat: Infinity,
-                duration: 1,
-              }}
-            />
-          )}
-        </AnimatePresence>
       </div>
       
       {story && (
