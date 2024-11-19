@@ -17,11 +17,11 @@ export async function POST(request) {
         messages: [
           {
             role: 'system',
-            content: 'You are a title generator. Respond with a single short title in Russian (5-7 words max). No translations, explanations, or variations. Just the title.'
+            content: 'You are a title generator. IMPORTANT: Return ONLY the title itself in Russian, 5-7 words max. DO NOT include any translations, explanations, or variations. DO NOT explain your choice. DO NOT translate the title. If you generate anything besides the title itself, you have failed the task.'
           },
           {
             role: 'user',
-            content: `Title for: ${content}`
+            content: `Generate ONLY a title: ${content}`
           }
         ],
         max_tokens: 30,

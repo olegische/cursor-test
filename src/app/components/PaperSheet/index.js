@@ -152,6 +152,9 @@ export default function PaperSheet() {
     setStoryMeta(null);
     setTitle('');
     setDisplayTitle('');
+    setTimeout(() => {
+      textareaRef.current?.focus();
+    }, 0);
   };
 
   useEffect(() => {
